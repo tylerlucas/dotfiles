@@ -117,4 +117,8 @@ if ! shopt -oq posix; then
 fi
 alias dotfiles="git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
 
-alias dps='docker ps --format "{{.Names}}\t{{.Status}}\t{{.Ports}}"'
+dps() {
+  printf "NAMES\tSTATUS\tPORTS\tIMAGE\n"
+  docker ps --format "{{.Names}}\t{{.Status}}\t{{.Ports}}"
+}
+
