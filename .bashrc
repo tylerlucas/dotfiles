@@ -117,9 +117,25 @@ fi
 alias dotfiles="git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
 
 dps() {
-  printf "NAMES\tSTATUS\tPORTS\tIMAGE\n"
-  docker ps --format "{{.Names}}\t{{.Status}}\t{{.Ports}}"
+  {
+    echo -e "NAMES\tSTATUS\tPORTS\tIMAGE"
+    docker ps --format "{{.Names}}\t{{.Status}}\t{{.Ports}}\t{{.Image}}"
+  } | awk -F'\t' '{
+         if ($1 == "NAMES") { print; next }
+         n = split($3, ports_arr, ",")
+         ports = ""
+         for (i = 1; i <= n; i++) {
+           token = ports_arr[i]
+           gsub(/^ +| +$/, "", token)
+           if (token !~ /^:::.*$/) {
+             ports = (ports == "" ? token : ports ", " token)
+           }
+         }
+         $3 = ports
+         print
+       }' OFS='\t' | column -t -s $'\t'
 }
+
 
 alias dlogs='docker logs'
 alias dexec='docker exec -it'
